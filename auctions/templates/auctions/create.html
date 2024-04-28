@@ -1,0 +1,31 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div class="container w-75 border border-2 border-info-subtle rounded-4 bg-secondary-subtle px-5 py-4 my-5">
+        <h1 class="display-6 mb-4">Create A Listing</h1>
+        <form action="{% url 'create' %}" method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="title" class="form-label fs-5">Title: </label>
+                <input type="text" class="form-control" name="title" id="title" placeholder="Enter Title" required>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="form-label fs-5">Description: </label>
+                <textarea class="form-control" name="description" id="description" cols="30" rows="10" placeholder="Enter Description"></textarea>
+            </div>
+        
+            <div class="mb-4">
+                <label for="startBid" class="form-label fs-5">Starting Bid: </label>
+                <input type="number" class="form-control" name="startBid" id="startBid" min="50" placeholder="Enter Starting Bid" required>
+            </div>
+        
+            <div class="mb-4">
+                <label for="imgUrl" class="form-label fs-5">Image URL(optional): </label>
+                <input type="url" class="form-control" name="imgUrl" id="imgUrl" placeholder="Enter Image Url">
+            </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    </div>
+    
+{% endblock %}

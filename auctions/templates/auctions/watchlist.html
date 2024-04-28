@@ -1,0 +1,17 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h1 class="display-6 mt-3 my-4">Watchlisted Items</h1>
+
+    {% if items != None %}
+        <div class="container list-group ms-2 w-75">
+            {% for item in items %}
+                <a href="{% url 'item' item.id %}" class="list-group-item list-group-item-action">{{ item.title }}</a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="lead fs-4 text-secondary ms-2">No items watchlisted yet!!</p>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+
+    <table class="table table-light table-hover table-responsive table-bordered border-info border-2">
+        <thead>
+            <tr>
+                <th scope="col" class="text-center">#</th>
+                <th scope="col" class="text-center">Item</th>
+                <th scope="col" class="text-center d-none d-lg-table-cell">Description</th>
+                <th scope="col" class="text-center">Starting Bid</th>
+                <th scope="col" class="text-center d-none d-lg-table-cell">Image</th>
+                <th scope="col" class="text-center col-1">Owner</th>
+                <th scope="col" class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider text-center align-middle">
+            {% for listing in listings %}
+                <tr>
+                    <th scope="row">
+                        {{ forloop.counter }}
+                    </th>
+                    <td>
+                        <a href="{% url 'item' listing.id %}" class="text-primary text-decoration-none">{{ listing.title }}</a>
+                    </td>
+                    <td class="font-monospace d-none d-lg-table-cell">
+                        {{ listing.description }}
+                    </td>
+                    <td>
+                        ${{ listing.start_bid }}
+                    </td>
+                    <td class="d-none d-lg-table-cell">
+                        {% if listing.url_pic is not 'N/A' %}
+                            <img src="{{ listing.url_pic }}" alt="listing_picture" class="img-thumbnail rounded mx-auto d-block" style="width: 20vw;">
+                        {% else %}
+                            --No Image Provided--
+                        {% endif %}
+                    </td>
+                    <td class="font-monospace">
+                        {{ listing.owner.username }}
+                    </td>
+                    {% if listing.status == 'Open' %}
+                        <td class="font-monospace text-success">
+                            {{ listing.status }}
+                        </td>
+                    {% else %}
+                        <td class="font-monospace text-danger">
+                            {{ listing.status }}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

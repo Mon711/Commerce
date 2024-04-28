@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}AukIt Auctions{% endblock %}</title>
+        <link rel="shortcut icon" href="{% static 'auctions/favicon.svg' %}" type="image/x-icon">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        <div>
+            {% if user.is_authenticated %}
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span>
+                        Signed in as <strong>{{ user.username }}</strong>.
+                    </span>
+                    <button class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% else %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <span>
+                        Not Signed In
+                    </span>
+                    <button class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
+        </div>
+
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <button class="navbar-toggler mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#closeNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="closeNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a href="{% url 'index' %}" class="nav-link">Homepage</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'listings' %}">Active Listings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'category' %}" class="nav-link">Categories</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'create' %}" class="nav-link">Create Listing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'watchlisted' %}" class="nav-link">My Watchlist</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}">Register</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <hr>
+
+        {% block body %}
+        {% endblock %}
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    </body>
+</html>

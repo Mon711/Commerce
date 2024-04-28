@@ -1,0 +1,33 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h1 class="display-6 mt-3 my-4">Categories</h1>
+
+    <div class="accordion w-75 ms-3 mt-4" id="accordion">
+        {% for category, items in categories.items %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}">
+                        {{ category }}
+                    </button>
+                </h2>
+                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordion">
+                    <div class="accordion-body">
+                        <ol>
+                            {% for item in items %}
+                                {% for k,v in item.items %}
+                                    <li>
+                                        <a href="{% url 'item' v %}" class="text-decoration-none">{{ k }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}

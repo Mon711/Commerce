@@ -1,0 +1,172 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div class="container text-center">
+        <!-- Alert to tell user whether bid successful or not -->
+        {% if message != None and color != None %}
+            <div class="alert alert-{{ color }} alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-diamond me-2"></i>
+                <span>
+                    {{ message }}
+                </span>
+                <button class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+
+        <!-- Print out item details -->
+        <h1 class="display-4 mb-3">{{ item.title }}</h1>
+
+        <p class="lead fs-4 my-4">
+            {{ item.description }}
+        </p>
+
+        <img src="{{ item.url_pic }}" alt="item_pic" class="img-fluid img-thumbnail w-25 mb-3">
+
+        <p class="font-monospace fs-4">
+            Starting Bid: <span class="text-success">${{ item.start_bid }}</span>
+        </p>
+        
+        {% if item.status == 'Open' %}
+            {% if watchlisted == False %}
+                <form action="{% url 'watchlist' item_id %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="bi bi-bag-dash" style="font-size: large;"></i>
+                        Add to my Watchlist
+                    </button>
+                </form>
+            {% else %}
+                <button class="btn btn-primary" type="button" disabled>
+                    <i class="bi bi-bag-check" style="font-size: large;"></i>
+                    Added to your Watchlist
+                </button>
+                <form action="{% url 'remove' item_id %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-danger mt-3" type="submit">
+                        <i class="bi bi-bag-x" style="font-size: large;"></i>
+                        Remove from Watchlist
+                    </button>
+                </form>
+            {% endif %}
+        {% endif %}
+
+
+        <!-- Check if user is signed in -->
+        {% if user.is_authenticated %}
+            <!-- If signed in, Check if logged user is NOT the owner of item  -->
+            {% if logged_in_user != owner %}
+                <!-- If yes, give user option of bidding -->
+                {% if item.status == 'Open' %}
+                    <div class="container pt-5 mt-2">  
+                        <div class="container d-flex justify-content-center">
+                            <form action="{% url 'bid' item_id %}" method="post">
+                                {% csrf_token %}
+                                <div class="mb-3 mt-2">
+                                    <label for="bidAmount" class="form-label fs-4">Place a Bid: </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" name="amount" id="bidAmount" class="form-control" min="{{ item.start_bid }}">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Place Bid</button>
+                            </form>
+                        </div>          
+                    </div>
+                    {% if maxBid != None %}
+                        <!-- If yes, display details of highest bidder -->
+                        {% if logged_in_user == maxBidder %}
+                            <p class="lead fs-4 mb-3 mt-4">Maximum Bid till now: <span class="mark bg-success-subtle">${{ maxBid }}</span> by {{ maxBidder }} (*You)</p>
+                        {% else %}
+                            <p class="lead fs-4 mb-3 mt-4">Maximum Bid till now: <span class="mark bg-success-subtle">${{ maxBid }}</span> by {{ maxBidder }}</p>
+                        {% endif %}
+                        <!-- If not, display so -->
+                    {% else %}
+                        <p class="lead fs-4 mt-2 pt-5 mb-0">Maximum Bid till now: <span class="fw-semibold">--No Bids placed yet--</span></p>
+                    {% endif %}
+                {% else %}
+                    {% if logged_in_user == maxBidder %}
+                        <p class="fst-italic text-success fs-3 mt-3">Congrats!! You won the Bid for this item</p>
+                    {% else %}
+                        <p class="lead fs-4 mt-5">Bidding for this item has been <span class="text-danger text-decoration-underline">Closed</span></p>
+                    {% endif %}
+                {% endif %}
+                
+            {% else %}
+                <!-- If no, GIVE option of closing bid if any placed yet -->
+                {% if maxBid != None %}
+                    <div class="container">
+                        {% if item.status == 'Open' %}
+
+                            <p class="lead fs-4 mb-3 mt-4">Maximum Bid till now: <span class="mark bg-success-subtle">${{ maxBid }}</span> by {{ maxBidder }}</p>
+
+                            <p class="monospace fs-4 mt-5 mb-1">This item was Listed by you!!</p>
+
+                            <form action="{% url 'close' item_id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Close Bid</button>
+                            </form>
+                        {% else %}
+                            <p class="monospace fs-4 mt-5 mb-1">This item was Listed by you!!</p>
+
+                            <p class="fst-italic mt-3 fs-5">Bidding for (your) item has been <span class="text-danger text-decoration-underline">Closed</span></p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <!-- If not signed in, NO option of bidding or closing bid -->
+            <p class="lead mt-5">
+                <a href="{% url 'login' %}" class="link-primary">Sign in</a> to place a bid    
+            </p>   
+        {% endif %}
+
+        <!-- Comments -->
+        {% if user.is_authenticated %}
+            <div class="container ms-0 ps-0" style="position: relative;top: 100px">
+                <div class="text-start">
+                    <h1 class="display-6 text-muted">Comments</h1>
+
+                    <hr class="text-secondary opacity-50 pb-3 w-75">
+    
+                    <div class="row align-items-start">
+                        <div class="col-auto pt-2">
+                                <i class="bi bi-person-circle" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div class="col">
+                            <form action="{% url 'comment' item_id %}" method="post" class="py-3 w-75">
+                                {% csrf_token %}
+                                <div class="form-floating">
+                                    <textarea class="form-control mb-3" placeholder="Leave a comment here" id="commentID" style="height: 90px" name="commentText"></textarea>
+                                    <label for="commentID">Leave a comment here</label>
+                                    <div class="text-end">
+                                        <button class="btn btn-primary" type="submit">Enter</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        {% if comments != "N/A" %}
+                            {% for comment in comments %}
+                                <div class="row mt-4 mb-3">
+                                    <!-- <div class="col-1">
+                                        <i class="bi bi-person-square img-thumbnail" style="font-size: 2rem;"></i>
+                                    </div> -->
+                                    <div class="col-7">
+                                        <p class="fs-3">{{ comment.username }}</p>
+                                        <hr class="text-black w-25">
+                                        <p class="monospace fs-5">{{ comment.text }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="container text-center my-3">
+                                <p class="fs-3">-- <span class="fst-italic">No comments till now</span> --</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}
